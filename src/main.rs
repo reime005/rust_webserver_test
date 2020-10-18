@@ -21,6 +21,8 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
     env_logger::init();
 
+    let port = std::env::var("PORT").unwrap_or(String::from("8080"));
+
     HttpServer::new(|| {
         App::new()
             .wrap(middleware::DefaultHeaders::new().header("X-Version", "0.2"))
@@ -36,7 +38,7 @@ async fn main() -> std::io::Result<()> {
             )
             .service(web::resource("/test1.html").to(|| async { "Test\r\n" }))
     })
-    .bind("0.0.0.0:8080")?
+    .bind(format!("0.0.0.0:{}", port))?
     .workers(1)
     .run()
     .await
